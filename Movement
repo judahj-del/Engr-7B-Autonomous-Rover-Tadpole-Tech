@@ -1,1 +1,40 @@
+void loop() {
+  int S1 = digitalRead(sensor1);
+  int S2 = digitalRead(sensor2);
 
+  // both sensors HIGH
+  if (S1 == HIGH && S2 == HIGH) {
+    // Stop both motors
+    digitalWrite(M1_forward, LOW);
+    digitalWrite(M1_reverse, LOW);
+    digitalWrite(M2_forward, LOW);
+    digitalWrite(M2_reverse, LOW);
+  }
+
+  // Sensor1 HIGH, Sensor2 LOW
+  else if (S1 == HIGH && S2 == LOW) {
+    // Motor2 forward, Motor1 stop
+    digitalWrite(M1_forward, LOW);
+    digitalWrite(M1_reverse, LOW);
+    digitalWrite(M2_forward, HIGH);
+    digitalWrite(M2_reverse, LOW);
+  }
+
+  // Sensor1 LOW, Sensor2 HIGH
+  else if (S1 == LOW && S2 == HIGH) {
+    // Motor1 forward, Motor2 stop
+    digitalWrite(M1_forward, HIGH);
+    digitalWrite(M1_reverse, LOW);
+    digitalWrite(M2_forward, LOW);
+    digitalWrite(M2_reverse, LOW);
+  }
+
+  // Both sensors LOW
+  else {
+    // Motor1 reverse, Motor2 forward
+    digitalWrite(M1_forward, LOW);
+    digitalWrite(M1_reverse, HIGH);
+    digitalWrite(M2_forward, HIGH);
+    digitalWrite(M2_reverse, LOW);
+  }
+}
