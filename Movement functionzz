@@ -1,54 +1,39 @@
-void stop() {
-   // both sensors HIGH
-   // Stop both motors
-  digitalWrite(M1_forward, LOW);
-  digitalWrite(M1_reverse, LOW);
-  digitalWrite(M2_forward, LOW);
-  digitalWrite(M2_reverse, LOW);
-  }
-
-void left_rotate() {
-  // Both sensors LOW
-  // Motor1 reverse, Motor2 forward
-  digitalWrite(M1_forward, LOW);
-  digitalWrite(M1_reverse, HIGH);
-  digitalWrite(M2_forward, HIGH);
-  digitalWrite(M2_reverse, LOW);
+void forward(){
+  motorLeft.setSpeed(150);
+  motorRight.setSpeed(150);
+  delay(1500);
 }
-
-void right_rotate() {
-  // Motor1 forward, Motor2 stop
-  digitalWrite(M1_forward, HIGH);
-  digitalWrite(M1_reverse, LOW);
-  digitalWrite(M2_forward, LOW);
-  digitalWrite(M2_reverse, HIGH);
   
-}
 
-void right() {
-  // Motor1 forward, Motor2 stop
-  digitalWrite(M1_forward, HIGH);
-  digitalWrite(M1_reverse, LOW);
-  digitalWrite(M2_forward, LOW);
-  digitalWrite(M2_reverse, LOW);
-  
-}
-
-void left() {
-  // Sensor1 HIGH, Sensor2 LOW
-  // Motor2 forward, Motor1 stop
-  digitalWrite(M1_forward, LOW);
-  digitalWrite(M1_reverse, LOW);
-  digitalWrite(M2_forward, HIGH);
-  digitalWrite(M2_reverse, LOW);
+void stop(){
+  motorLeft.setSpeed(0);
+  motorRight.setSpeed(0);
+  delay(800);
 }
 
 
-void forward() {
-  // both sensors HIGH
-  // Stop both motors
-  digitalWrite(M1_forward, LOW);
-  digitalWrite(M1_reverse, LOW);
-  digitalWrite(M2_forward, LOW);
-  digitalWrite(M2_reverse, LOW);
+void reverse(){
+  motorLeft.setSpeed(-150);
+  motorRight.setSpeed(-150);
+  delay(1500);
+}
+
+void right(){
+  motorLeft.setSpeed(0);
+  motorRight.setSpeed(150);
+}
+
+void hard_right(){
+  motorLeft.setSpeed(-150);
+  motorRight.setSpeed(150);
+}
+
+void left(){
+  motorLeft.setSpeed(150);
+  motorRight.setSpeed(0);
+}
+
+void hard_left(){
+  motorLeft.setSpeed(150);
+  motorRight.setSpeed(-150);
 }
