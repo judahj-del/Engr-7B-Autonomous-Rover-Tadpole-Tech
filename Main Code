@@ -3,5 +3,5 @@ void loop(){
   int frontright = digitalRead(frsensor);
   int backleft = digitalRead(blsensor);
   int backright = digitalRead(brsensor);
-  irsensor(frontleft, frontright, backleft, backright);
+  irsensor(frontright, frontleft, backleft, backright);
 }
