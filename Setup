@@ -12,6 +12,8 @@ int frsensor = 2; // front right ir sensor
 int blsensor = 3; // back left ir sensor
 int brsensor = 4; // back right sensor
 
+int endirsensor = 0;
+
 
 //The stuff in parentheses is the cytron motor: mode, PWM pin, DIR pin
 CytronMD motorLeft(PWM_DIR, 7, 8);
