@@ -4,14 +4,14 @@
 
 Pixy2 pixy;
 
+Servo closeservo;
+Servo liftservo;
+
 int flsensor = 1; // front left ir sensor
-int frsensor = 2; //front
-//right ir sensor
+int frsensor = 2; // front right ir sensor
 int blsensor = 3; // back left ir sensor
 int brsensor = 4; // back right sensor
 
-
-int clawservo = 5; // servo that closes claw
 
 //The stuff in parentheses is the cytron motor: mode, PWM pin, DIR pin
 CytronMD motorLeft(PWM_DIR, 7, 8);
@@ -22,6 +22,8 @@ void setup() {
   Serial.begin(115200);
   // Pixy startup check
   pixy.init();
+  closeservo.attach(9);
+  liftservo.attach(8)
   pinmode(flsensor, INPUT);
   pinmode(frsensor, INPUT);
   pinmode(blsensor, INPUT);
