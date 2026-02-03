@@ -2,17 +2,28 @@ void irsensor(int frontright, int frontleft, int backleft, int backright) {
   if(frontleft == 1 && frontright == 1) {
     stop(); // if the two front sensors read black, then the rover should stop
     int endirfunction == 1;
-  } else if(frontright == 0 && frontleft == 1) {
+
+  } 
+  else if(frontright == 0 && frontleft == 1) {
     left(); //if the sensor detects black slightly to the left, then it will turn left
-  } else if(frontright == 1 && frontleft == 0) {
+
+  } 
+  else if(frontright == 1 && frontleft == 0) {
     right(); //if the sensor detects black slightly to the right, then it will turn right to have the 
     //line in between the two sensors 
-  } else if(frontright == 0 && frontleft == 0 && backright == 1 && backleft == 0) {
+
+  } 
+  else if(frontright == 0 && frontleft == 0 && backright == 1 && backleft == 0) {
     hardright(); //if the rover detects black to the back right, then it hard turns in that direction
-  } else if(frontright == 0 && frontleft == 0 && backright == 0 && backleft == 1) {
+
+  } 
+  else if(frontright == 0 && frontleft == 0 && backright == 0 && backleft == 1) {
     hardleft(); // if the rover detects black to the back left, then it will do a hard turn 
     //in that direction to find the line
-  } else {
+
+  } 
+  else {
     forward(); //if all of the sensors read white, then the rover should continue moving forward
   }
+
 }
