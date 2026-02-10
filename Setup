@@ -14,7 +14,13 @@ int brsensor = 4; // back right sensor
 
 int endirsensor = 0;
 
+//pixy variables
 int Kp = 1.5;
+int center_x = 150;
+int turn_threshold = 5;
+int min_speed = 50;
+int max_speed = 150;
+int target_width = 200;
 
 //The stuff in parentheses is the cytron motor: mode, PWM pin, DIR pin
 CytronMD motorLeft(PWM_DIR, 7, 8);
