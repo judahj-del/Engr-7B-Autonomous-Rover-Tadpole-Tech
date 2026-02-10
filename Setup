@@ -14,6 +14,7 @@ int brsensor = 4; // back right sensor
 
 int endirsensor = 0;
 
+int Kp = 1.5;
 
 //The stuff in parentheses is the cytron motor: mode, PWM pin, DIR pin
 CytronMD motorLeft(PWM_DIR, 7, 8);
