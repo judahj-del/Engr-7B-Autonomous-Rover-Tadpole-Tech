@@ -1,39 +1,48 @@
+//positive input for left is forward, negative input for right is forward
+
 void forward(){
   motorLeft.setSpeed(150);
-  motorRight.setSpeed(150);
-  delay(1500);
+  motorRight.setSpeed(-150);
 }
   
 
 void stop(){
   motorLeft.setSpeed(0);
   motorRight.setSpeed(0);
-  delay(800);
 }
 
 
 void reverse(){
   motorLeft.setSpeed(-150);
-  motorRight.setSpeed(-150);
-  delay(1500);
+  motorRight.setSpeed(150);
 }
 
 void right(){
-  motorLeft.setSpeed(0);
-  motorRight.setSpeed(150);
-}
-
-void hard_right(){
-  motorLeft.setSpeed(-150);
-  motorRight.setSpeed(150);
-}
-
-void left(){
   motorLeft.setSpeed(150);
   motorRight.setSpeed(0);
 }
 
-void hard_left(){
+void hard_right(){
   motorLeft.setSpeed(150);
+  motorRight.setSpeed(150);
+}
+
+void left(){
+  motorLeft.setSpeed(0);
   motorRight.setSpeed(-150);
+}
+
+void hard_left(){
+  motorLeft.setSpeed(-150);
+  motorRight.setSpeed(-150);
+}
+
+void prop_left(speed){
+  motorLeft.setSpeed(-speed);
+  motorRight.setSpeed(-speed);
+}
+
+void prop_right(speed) {
+  motorLeft.seSpeed(speed);
+  motorRight.setSpeed(speed);
 }
