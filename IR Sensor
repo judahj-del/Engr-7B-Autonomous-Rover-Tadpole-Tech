@@ -1,4 +1,4 @@
-void irsensor(int frontright, int frontleft, int backleft, int backright) {
+void irsensor() {
   int frontleft = digitalRead(flsensor); 
   int frontright = digitalRead(frsensor);
   int backleft = digitalRead(blsensor);
