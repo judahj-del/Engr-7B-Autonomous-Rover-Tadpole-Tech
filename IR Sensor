@@ -1,4 +1,8 @@
 void irsensor(int frontright, int frontleft, int backleft, int backright) {
+  int frontleft = digitalRead(flsensor); 
+  int frontright = digitalRead(frsensor);
+  int backleft = digitalRead(blsensor);
+  int backright = digitalRead(brsensor);
   if(frontleft == 1 && frontright == 1) {
     stop(); // if the two front sensors read black, then the rover should stop
     int endirfunction == 1;
