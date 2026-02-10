@@ -1,1 +1,33 @@
 
+void pixytrack(){
+  pixy.ccc.getBlocks(); 
+  if(pixy.ccc.numBlocks > 0) {
+
+    int object_x = pixy.ccc.blocks[0].m_x;
+    int object_width = pixy.ccc.blocks[0].m_width;
+  
+    int error = object_x - center_x;
+    int turnspeed = abs(error) * Kp;
+    int turnconstrained = (turnspeed, min_speed, max_speed); //calculate error and use it to find the speed for proportional control
+
+    if(error < -turn_threshold){ // if error is negative & less than turn threshold, that means the object is to the left of the rover
+      prop_left(turnconstrained); 
+    } 
+      else if(error > turn_threshold) { // if the error is positive and greater than the threshold, then the object is to the right of the rover.
+      prop_right(turnconstrained);
+    } 
+    else {
+          if(object_width < target_width){
+              forward();
+          } else {
+              grabObject();
+          }
+    }
+  } 
+  else {
+        stopMotors();
+  }
+
+}
+
+void grabObject(); // finish this later
