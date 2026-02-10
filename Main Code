@@ -1,9 +1,7 @@
 void loop(){
-  int frontleft = digitalRead(flsensor); 
-  int frontright = digitalRead(frsensor);
-  int backleft = digitalRead(blsensor);
-  int backright = digitalRead(brsensor);
   if(endirsensor == 0) {  // added a conditional to the ir sensor function so it will deactivate once the two front sensors read black
-    irsensor(frontright, frontleft, backleft, backright);
+    irsensor();
+  } else {
+  pixytrack();
   }
 }
