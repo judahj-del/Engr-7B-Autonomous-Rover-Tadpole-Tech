@@ -77,38 +77,3 @@ void steerRight(int baseSpeed, int amount) {
 
   setMotors(left, right);
 }
-
-void setup() {
-  stopMotors();  // start with no speed so it doesnt randomly move
-}
-
-void loop() {
-
-  // just testing movement for now
-
-  forward(120);
-  delay(1500);
-
-  stopMotors();
-  delay(500);
-
-  turnLeft(120);
-  delay(800);
-
-  stopMotors();
-  delay(1000);
-}
-void hard_left(){
-  motorLeft.setSpeed(-150);
-  motorRight.setSpeed(-150);
-}
-
-void prop_left(speed){
-  motorLeft.setSpeed(-speed);
-  motorRight.setSpeed(-speed);
-}
-
-void prop_right(speed) {
-  motorLeft.seSpeed(speed);
-  motorRight.setSpeed(speed);
-}
