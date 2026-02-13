@@ -1,37 +1,103 @@
-//positive input for left is forward, negative input for right is forward
+#include <CytronMotorDriver.h>
 
-void forward(){
-  motorLeft.setSpeed(150);
-  motorRight.setSpeed(-150);
-}
-  
-
-void stop(){
-  motorLeft.setSpeed(0);
-  motorRight.setSpeed(0);
-}
+// cytron driver pins we used
+// (mode, PWM pin, DIR pin)
+CytronMD motorLeft(PWM_DIR, 7, 8);
+CytronMD motorRight(PWM_DIR, 9, 10);
 
 
-void reverse(){
-  motorLeft.setSpeed(-150);
-  motorRight.setSpeed(150);
-}
+// Set max speed
+const int MAX_SPEED = 200;
 
-void right(){
-  motorLeft.setSpeed(150);
-  motorRight.setSpeed(0);
+// just making sure the code doesnt send a bad input
+int clampSpeed(int s) {
+  if (s > MAX_SPEED) return MAX_SPEED;
+  if (s < 0) return 0;
+  return s;
 }
 
-void hard_right(){
-  motorLeft.setSpeed(150);
-  motorRight.setSpeed(150);
+// main function for tha motors
+// positive = forward
+// negative = backward
+void setMotors(int leftSpeed, int rightSpeed) {
+  motorLeft.setSpeed(leftSpeed);
+  motorRight.setSpeed(rightSpeed);
 }
 
-void left(){
-  motorLeft.setSpeed(0);
-  motorRight.setSpeed(-150);
+// stops everything
+void stopMotors() {
+  setMotors(0, 0);
 }
 
+// both motors forward
+void forward(int speed) {
+  speed = clampSpeed(speed);
+  setMotors(speed, speed);
+}
+
+// both motors backward
+void backward(int speed) {
+  speed = clampSpeed(speed);
+  setMotors(-speed, -speed);
+}
+
+// spin in place left
+// left wheel backward, right wheel forward
+void turnLeft(int speed) {
+  speed = clampSpeed(speed);
+  setMotors(-speed, speed);
+}
+
+// spin in place right
+void turnRight(int speed) {
+  speed = clampSpeed(speed);
+  setMotors(speed, -speed);
+}
+
+// this is for smoother turning while moving forward
+// not a full spin, just slowing one side down
+void steerLeft(int baseSpeed, int amount) {
+
+  int left = baseSpeed - amount;   // slow left motor
+  int right = baseSpeed + amount;  // speed up right motor
+
+  if (left < 0) left = 0;
+  if (right > MAX_SPEED) right = MAX_SPEED;
+
+  setMotors(left, right);
+}
+
+void steerRight(int baseSpeed, int amount) {
+
+  int left = baseSpeed + amount;
+  int right = baseSpeed - amount;
+
+  if (right < 0) right = 0;
+  if (left > MAX_SPEED) left = MAX_SPEED;
+
+  setMotors(left, right);
+}
+
+void setup() {
+  stopMotors();  // start with no speed so it doesnt randomly move
+}
+
+void loop() {
+
+  // just testing movement for now
+
+  forward(120);
+  delay(1500);
+
+  stopMotors();
+  delay(500);
+
+  turnLeft(120);
+  delay(800);
+
+  stopMotors();
+  delay(1000);
+}
 void hard_left(){
   motorLeft.setSpeed(-150);
   motorRight.setSpeed(-150);
