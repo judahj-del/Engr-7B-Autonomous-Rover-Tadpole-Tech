@@ -11,10 +11,10 @@ void pixytrack(){
     int turnconstrained = (turnspeed, min_speed, max_speed); //calculate error and use it to find the speed for proportional control
 
     if(error < -turn_threshold){ // if error is negative & less than turn threshold, that means the object is to the left of the rover
-      prop_left(turnconstrained); 
+      left(turnconstrained, turnconstrained); 
     } 
       else if(error > turn_threshold) { // if the error is positive and greater than the threshold, then the object is to the right of the rover.
-      prop_right(turnconstrained);
+      right(turnconstrained, turnconstrained);
     } 
     else {
           if(object_width < target_width){
