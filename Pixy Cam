@@ -20,14 +20,20 @@ void pixytrack(){
           if(object_width < target_width){
               forward();
           } else {
-              grabObject();
+              stopMotors();
+              return;
           }
     }
   } 
   else {
-        stopMotors();
+        right(150);
   }
 
 }
 
-void grabObject(); // finish this later
+void grabObject() {
+  claw.write(90);
+  delay(1000);
+  lift.write(90);
+  return;
+}// finish this later
