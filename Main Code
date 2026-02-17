@@ -1,6 +1,30 @@
+#include <CytronMotorDriver.h>
+#include <Pixy2.h>
+#include <Servo.h>
 
+Pixy2 pixy;
 
-}
+Servo closeservo;
+Servo liftservo;
+
+int flsensor = 1; // front left ir sensor
+int frsensor = 2; // front right ir sensor
+int blsensor = 3; // back left ir sensor
+int brsensor = 4; // back right sensor
+
+int endirsensor = 0;
+
+//pixy variables
+int Kp = 1.5;
+int center_x = 150;
+int turn_threshold = 5;
+int min_speed = 50;
+int max_speed = 150;
+int target_width = 200;
+
+//The stuff in parentheses is the cytron motor: mode, PWM pin, DIR pin
+CytronMD motorLeft(PWM_DIR, 7, 8);
+CytronMD motorRight(PWM_DIR, 9, 10);
 // cytron driver pins we used
 // (mode, PWM pin, DIR pin)
 CytronMD motorLeft(PWM_DIR, 7, 8);
@@ -83,6 +107,21 @@ void setup() {
   stopMotors();  // start with no speed so it doesnt randomly move
 }
 
+
+void setup() {
+  Serial.begin(115200);
+  // Pixy startup check
+  pixy.init();
+  closeservo.attach(9);
+  liftservo.attach(8)
+  pinmode(flsensor, INPUT);
+  pinmode(frsensor, INPUT);
+  pinmode(blsensor, INPUT);
+  pinmode(brsensor, INPUT);
+}
+
+
+
 void loop() {
 
   // just testing movement for now
@@ -100,6 +139,12 @@ void loop() {
   delay(1000);
 
 // Josh's code
+if(endirsensor == 0) {  // added a conditional to the ir sensor function so it will deactivate once the two front sensors read black
+    irsensor();
+  } else {
+  pixytrack();
+  }
+}
 #include <CytronMotorDriver.h>
 
 void irsensor() {
