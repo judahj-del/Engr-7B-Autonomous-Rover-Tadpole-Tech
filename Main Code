@@ -102,12 +102,8 @@ void setup() {
 }
 
 void loop() {
-
-  if (endirsensor == 0) {
-    irsensor();
-  }
-  else {
-    // pixytrack();  // uncomment once that function exists
-  }
+irsensor();
+pixytracker();
+grabobject();
 }
 
