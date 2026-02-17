@@ -61,7 +61,7 @@ void irsensor() {
 
   if (frontleft == 1 && frontright == 1) {
     stopMotors();
-    endirsensor = 1;   // assignment, not comparison
+    return;   // assignment, not comparison
   }
 
   else if (frontright == 0 && frontleft == 1) {
