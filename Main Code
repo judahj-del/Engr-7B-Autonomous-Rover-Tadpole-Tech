@@ -100,12 +100,6 @@ void loop() {
   delay(1000);
 
 // Josh's code
-if(endirsensor == 0) {  // added a conditional to the ir sensor function so it will deactivate once the two front sensors read black
-    irsensor();
-  } else {
-  pixytrack();
-  }
-}
 #include <CytronMotorDriver.h>
 
 void irsensor() {
