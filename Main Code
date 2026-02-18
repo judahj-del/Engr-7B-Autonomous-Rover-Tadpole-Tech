@@ -7,24 +7,30 @@ Pixy2 pixy;
 Servo closeservo;
 Servo liftservo;
 
-int flsensor = 1;
-int frsensor = 2;
-int blsensor = 3;
-int brsensor = 4;
+int flsensor = 0;
+int frsensor = 1;
+int blsensor = 4;
+int brsensor = 5;
 
-int endirsensor = 0;
 
 // motors (ONLY DEFINE ONCE)
-CytronMD motorLeft(PWM_DIR, 7, 8);
-CytronMD motorRight(PWM_DIR, 9, 10);
+CytronMD motorLeft(PWM_DIR, 6, 7);
+CytronMD motorRight(PWM_DIR, 2, 3);
 
 const int MAX_SPEED = 200;
-
+const int MIN_SPEED = 50;
 // keeps speed in safe range
+
 int clampSpeed(int s) {
-  if (s > MAX_SPEED) return MAX_SPEED;
-  if (s < 0) return 0;
+  if (s > MAX_SPEED) {
+    return MAX_SPEED;
+  }
+  else if (s < MIN_SPEED) {
+    return 0;
+  } 
+  else {
   return s;
+  }
 }
 
 void setMotors(int leftSpeed, int rightSpeed) {
@@ -37,18 +43,18 @@ void stopMotors() {
 }
 
 void forward(int speed) {
-  speed = clampSpeed(speed);
-  setMotors(speed, speed);
+  int limspeed = clampSpeed(speed);
+  setMotors(limspeed, limspeed);
 }
 
 void turnLeft(int speed) {
-  speed = clampSpeed(speed);
-  setMotors(-speed, speed);
+  int limspeed = clampSpeed(speed);
+  setMotors(-limspeed, limspeed);
 }
 
 void turnRight(int speed) {
-  speed = clampSpeed(speed);
-  setMotors(speed, -speed);
+  int limspeed = clampSpeed(speed);
+  setMotors(limspeed, -limspeed);
 }
 
 // IR SENSOR FUNCTION
@@ -61,7 +67,7 @@ void irsensor() {
 
   if (frontleft == 1 && frontright == 1) {
     stopMotors();
-    return;   // assignment, not comparison
+    // return;  // assignment, not comparison
   }
 
   else if (frontright == 0 && frontleft == 1) {
@@ -73,11 +79,11 @@ void irsensor() {
   }
 
   else if (frontright == 0 && frontleft == 0 && backright == 1 && backleft == 0) {
-    turnRight(150);   // hard right
+    turnRight(150);  // hard right
   }
 
   else if (frontright == 0 && frontleft == 0 && backright == 0 && backleft == 1) {
-    turnLeft(150);    // hard left
+    turnLeft(150);  // hard left
   }
 
   else {
@@ -88,10 +94,10 @@ void irsensor() {
 void setup() {
 
   Serial.begin(115200);
-  pixy.init();
+ // pixy.init();
 
   closeservo.attach(9);
-  liftservo.attach(8);   // missing semicolon fixed
+  liftservo.attach(10);  // missing semicolon fixed
 
   pinMode(flsensor, INPUT);
   pinMode(frsensor, INPUT);
@@ -102,8 +108,7 @@ void setup() {
 }
 
 void loop() {
-irsensor();
-pixytracker();
-grabobject();
+  irsensor();
+ // pixytracker();
+ // grabobject();
 }
-
