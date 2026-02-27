@@ -7,10 +7,10 @@ Pixy2 pixy;
 Servo closeservo;
 Servo liftservo;
 
-int flsensor = 0;
-int frsensor = 1;
-int blsensor = 4;
-int brsensor = 5;
+int flsensor = 4;
+int frsensor = 5;
+int blsensor = 8;
+int brsensor = 11;
 
 
 // motors (ONLY DEFINE ONCE)
