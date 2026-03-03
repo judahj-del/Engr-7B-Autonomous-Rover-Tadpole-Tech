@@ -10,12 +10,14 @@ Servo liftservo;
 int flsensor = 4;
 int frsensor = 5;
 int blsensor = 8;
-int brsensor = 11;
+int brsensor = A1;
 
+int object_width = 40;
+int center_x = 150;
 
 // motors (ONLY DEFINE ONCE)
 CytronMD motorLeft(PWM_DIR, 6, 7);
-CytronMD motorRight(PWM_DIR, 2, 3);
+CytronMD motorRight(PWM_DIR, 3, 2);
 
 const int MAX_SPEED = 200;
 const int MIN_SPEED = 50;
@@ -26,7 +28,7 @@ int clampSpeed(int s) {
     return MAX_SPEED;
   }
   else if (s < MIN_SPEED) {
-    return 0;
+    return 50;
   } 
   else {
   return s;
@@ -44,17 +46,56 @@ void stopMotors() {
 
 void forward(int speed) {
   int limspeed = clampSpeed(speed);
-  setMotors(limspeed, limspeed);
+  setMotors(limspeed, limspeed); //left forward right forward
 }
 
 void turnLeft(int speed) {
   int limspeed = clampSpeed(speed);
-  setMotors(-limspeed, limspeed);
+  setMotors(limspeed, 0); //left backward right forward
 }
 
 void turnRight(int speed) {
   int limspeed = clampSpeed(speed);
-  setMotors(limspeed, -limspeed);
+  setMotors(0, limspeed); //left forward right backward
+}
+
+void pixytrack(){
+  pixy.ccc.getBlocks(); 
+  if(pixy.ccc.numBlocks > 0) {
+
+    int object_x = pixy.ccc.blocks[0].m_x;
+    int object_width = pixy.ccc.blocks[0].m_width;
+  
+    int error = object_x - center_x;
+    int turnspeed = abs(error) * Kp;
+    int turnconstrained = (turnspeed, min_speed, max_speed); //calculate error and use it to find the speed for proportional control
+
+    if(error < -turn_threshold){ // if error is negative & less than turn threshold, that means the object is to the left of the rover
+      left(turnconstrained, turnconstrained); 
+    } 
+      else if(error > turn_threshold) { // if the error is positive and greater than the threshold, then the object is to the right of the rover.
+      right(turnconstrained, turnconstrained);
+    } 
+    else {
+          if(object_width < target_width){
+              forward();
+          } else {
+              stopMotors();
+              return;
+          }
+    }
+  } 
+  else {
+        right(150);
+  }
+
+}
+
+void grabObject() {
+  claw.write(90);
+  delay(1000);
+  lift.write(90);
+  return;
 }
 
 // IR SENSOR FUNCTION
@@ -62,9 +103,13 @@ void irsensor() {
 
   int frontleft = digitalRead(flsensor);
   int frontright = digitalRead(frsensor);
-  int backleft = digitalRead(blsensor);
-  int backright = digitalRead(brsensor);
-
+  //int backleft = digitalRead(blsensor);
+ // int backright = digitalRead(brsensor);
+  Serial.print(frontleft);
+  Serial.println(frontright);
+  //Serial.print(backleft);
+  //Serial.println(backright);
+  
   if (frontleft == 1 && frontright == 1) {
     stopMotors();
     // return;  // assignment, not comparison
@@ -78,37 +123,36 @@ void irsensor() {
     turnRight(100);
   }
 
-  else if (frontright == 0 && frontleft == 0 && backright == 1 && backleft == 0) {
-    turnRight(150);  // hard right
-  }
+ // else if (frontright == 0 && frontleft == 0 && backright == 1 && backleft == 0) {
+   // turnRight(150);  // hard right
+ // }
 
-  else if (frontright == 0 && frontleft == 0 && backright == 0 && backleft == 1) {
-    turnLeft(150);  // hard left
-  }
+  //else if (frontright == 0 && frontleft == 0 && backright == 0 && backleft == 1) {
+    //turnLeft(150);  // hard left
+  //}
 
   else {
-    forward(100);
+    forward(130);
   }
 }
 
 void setup() {
 
   Serial.begin(115200);
+  Serial.begin(9600);
+  
  // pixy.init();
 
-  closeservo.attach(9);
-  liftservo.attach(10);  // missing semicolon fixed
+//  closeservo.attach(9);
+//  liftservo.attach(10);  // missing semicolon fixed
 
   pinMode(flsensor, INPUT);
   pinMode(frsensor, INPUT);
   pinMode(blsensor, INPUT);
-  pinMode(brsensor, INPUT);
-
-  stopMotors();
+  pinMode(brsensor, INPUT_PULLUP);
 }
-
 void loop() {
-  irsensor();
+  //irsensor();
  // pixytracker();
  // grabobject();
 }
