@@ -17,9 +17,9 @@ int object_width = 40;
 //pixy variables
 float Kp = 1.5;
 int center_x = 160;
-int turn_threshold = 5;
+int turn_threshold = 20;
 int min_speed = 50;
-int max_speed = 150;
+int max_speed = 200;
 int target_width = 150;
 
 // motors (ONLY DEFINE ONCE)
@@ -58,12 +58,21 @@ void forward(int speed) {
 
 void turnLeft(int speed) {
   int limspeed = clampSpeed(speed);
-  setMotors(limspeed, 0); //left backward right forward
+  setMotors(limspeed, -limspeed); //left backward right forward
 }
 
 void turnRight(int speed) {
   int limspeed = clampSpeed(speed);
-  setMotors(0, limspeed); //left forward right backward
+  setMotors(-limspeed, limspeed); //left forward right backward
+}
+void hardRight(int speed) {
+  int limspeed = clampSpeed(speed);
+  setMotors(-limspeed, limspeed); //left forward right backward
+}
+
+void hardLeft(int speed) {
+  int limspeed = clampSpeed(speed);
+  setMotors(limspeed, -limspeed); //left backward right forward
 }
 
 void pixytrack(){
@@ -99,7 +108,7 @@ void pixytrack(){
     } 
     else {
           if(object_width < target_width){
-              forward(75);
+              forward(200);
           } else {
               stopMotors();
               Serial.print("Good");
@@ -117,8 +126,8 @@ void pixytrack(){
 //45 is base for lift
 //90 is base for grab
 void grabObject() {
-  claw.write(65);
-  lift.write(25);
+  claw.write(25);
+  lift.write(15);
   
 
   
@@ -133,37 +142,46 @@ void irsensor() {
   
   int frontleft = digitalRead(flsensor);
   int frontright = digitalRead(frsensor);
-  //int backleft = digitalRead(blsensor);
- // int backright = digitalRead(brsensor);
+  int backleft = digitalRead(blsensor);
+  int backright = digitalRead(brsensor);
   //Serial.print(frontleft);
   //Serial.println(frontright);
   //Serial.print(backleft);
   //Serial.println(backright);
   
-  if (frontleft == 1 && frontright == 1) {
+  if (frontleft == 1 && frontright == 1 && backleft == 1 && backright == 1) {
     stopMotors();
+    delay(2000);
     function = 2;
     return;  // assignment, not comparison
   }
 
-  else if (frontright == 0 && frontleft == 1) {
-    turnLeft(100);
+  else if (frontright == 0 && frontleft == 1 || backleft == 1) {
+    if(backleft == 1){
+      turnLeft(175);
+    } else {
+      turnLeft(125);
+    }
   }
 
-  else if (frontright == 1 && frontleft == 0) {
-    turnRight(100);
+  else if (frontright == 1 && frontleft == 0 || backright == 1) {
+    if(backright == 1){
+      turnRight(175);
+    } else {
+      turnRight(150);
+    }
   }
 
- // else if (frontright == 0 && frontleft == 0 && backright == 1 && backleft == 0) {
-   // turnRight(150);  // hard right
- // }
+  //else if (frontright == 0 && frontleft == 0 && backright == 1 && backleft == 0) {
+    //hardRight(150);  // hard right
+  //}
 
   //else if (frontright == 0 && frontleft == 0 && backright == 0 && backleft == 1) {
-    //turnLeft(150);  // hard left
+    //hardLeft(150);  // hard left
   //}
 
   else {
-    forward(130);
+    forward(185);
   }
 }
 
@@ -176,7 +194,7 @@ void setup() {
 
   claw.attach(9);
   lift.attach(10);
-  claw.write(90)
+  claw.write(90);
   lift.write(45);
   pinMode(flsensor, INPUT);
   pinMode(frsensor, INPUT);
