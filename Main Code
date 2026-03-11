@@ -2,34 +2,45 @@
 #include <Pixy2.h>
 #include <Servo.h>
 
+// Camera object for object detection/tracking
 Pixy2 pixy;
 
+// Servo objects for the claw and lift mechanism
 Servo claw;
 Servo lift;
 
+// IR line sensor pins
 int flsensor = 4;
 int frsensor = 5;
 int blsensor = 8;
 int brsensor = A1;
+
+// Robot mode:
+// 1 = line follow
+// 2 = Pixy tracking
+// 3 = grab object
 int function = 1;
+
+// Stores detected object width
 int object_width = 40;
 
-//pixy variables
+// Pixy tracking control values
 float Kp = 1.5;
 int center_x = 160;
-int turn_threshold = 20;
+int turn_threshold = 15;
 int min_speed = 50;
 int max_speed = 200;
 int target_width = 150;
 
-// motors (ONLY DEFINE ONCE)
+// Motor driver objects
 CytronMD motorLeft(PWM_DIR, 6, 7);
 CytronMD motorRight(PWM_DIR, 3, 2);
 
-const int MAX_SPEED = 200;
+// Speed limits for motor protection/control
+const int MAX_SPEED = 250;
 const int MIN_SPEED = 50;
-// keeps speed in safe range
 
+// Keeps motor speed within allowed range
 int clampSpeed(int s) {
   if (s > MAX_SPEED) {
     return MAX_SPEED;
@@ -38,178 +49,184 @@ int clampSpeed(int s) {
     return 50;
   } 
   else {
-  return s;
+    return s;
   }
 }
 
+// -------------------- Movement Functions --------------------
+
+// Sets left and right motor speeds directly
 void setMotors(int leftSpeed, int rightSpeed) {
   motorLeft.setSpeed(leftSpeed);
   motorRight.setSpeed(rightSpeed);
 }
 
+// Stops both motors
 void stopMotors() {
   setMotors(0, 0);
 }
 
+// Drives forward
 void forward(int speed) {
   int limspeed = clampSpeed(speed);
-  setMotors(limspeed, limspeed); //left forward right forward
+  setMotors(limspeed, limspeed);
 }
 
+// Turns left in place
 void turnLeft(int speed) {
   int limspeed = clampSpeed(speed);
-  setMotors(limspeed, -limspeed); //left backward right forward
+  setMotors(limspeed, -limspeed);
 }
 
+// Turns right in place
 void turnRight(int speed) {
   int limspeed = clampSpeed(speed);
-  setMotors(-limspeed, limspeed); //left forward right backward
-}
-void hardRight(int speed) {
-  int limspeed = clampSpeed(speed);
-  setMotors(-limspeed, limspeed); //left forward right backward
+  setMotors(-limspeed, limspeed);
 }
 
-void hardLeft(int speed) {
-  int limspeed = clampSpeed(speed);
-  setMotors(limspeed, -limspeed); //left backward right forward
-}
+// -------------------- Pixy Camera Tracking --------------------
 
-void pixytrack(){
+// Tracks the detected object and moves toward it
+void pixytrack() {
   pixy.ccc.getBlocks();
   
-  if(pixy.ccc.numBlocks > 0) {
+  if (pixy.ccc.numBlocks > 0) {
 
     int object_x = pixy.ccc.blocks[0].m_x;
     int object_width = pixy.ccc.blocks[0].m_width;
-    Serial.print(object_width);
-    Serial.println(object_x);
-    int error = object_x - center_x;
-    int turnspeed = abs(error) * Kp;
-    int turnconstrained = (turnspeed, min_speed, max_speed); //calculate error and use it to find the speed for proportional control
 
-    if(error < -turn_threshold){ // if error is negative & less than turn threshold, that means the object is to the left of the rover
-      turnRight(turnconstrained); 
-      if (object_width > target_width){
+    // Calculate horizontal error from center of camera view
+    int error = object_x - center_x;
+
+    // Proportional turning speed based on error
+    int turnspeed = abs(error) * Kp;
+    int turnconstrained = (turnspeed, min_speed, max_speed);
+
+    // Object is left of center
+    if (error < -turn_threshold) {
+      turnRight(turnconstrained);
+
+      // Stop and switch to grab mode if close enough
+      if (object_width > target_width) {
         stopMotors();
-        Serial.print("Bye");
         function = 3;
         return;
       }
     } 
-      else if(error > turn_threshold) { // if the error is positive and greater than the threshold, then the object is to the right of the rover.
-        turnLeft(turnconstrained);
-        if (object_width > target_width){
-          stopMotors();
-          Serial.print("Hi");
-          function = 3;
-          return;
-        }
+
+    // Object is right of center
+    else if (error > turn_threshold) {
+      turnLeft(turnconstrained);
+
+      // Stop and switch to grab mode if close enough
+      if (object_width > target_width) {
+        stopMotors();
+        function = 3;
+        return;
+      }
     } 
+
+    // Object is centered
     else {
-          if(object_width < target_width){
-              forward(200);
-          } else {
-              stopMotors();
-              Serial.print("Good");
-              function = 3;
-              return;
-          }
+      if (object_width < target_width) {
+        forward(250);
+      } 
+      else {
+        stopMotors();
+        function = 3;
+        return;
+      }
     }
   } 
+  
+  // No object detected, keep searching
   else {
-        turnRight(150);
+    turnRight(150);
   }
-
 }
 
-//45 is base for lift
-//90 is base for grab
+// -------------------- Claw Function --------------------
+
+// 45 is base for lift
+// 90 is base for claw
 void grabObject() {
   claw.write(25);
-  lift.write(15);
-  
-
-  
-  
-  
-  
+  lift.write(20);
   return;
 }
 
-// IR SENSOR FUNCTION
+// -------------------- IR Sensor Line Following --------------------
+
+// Uses IR sensors to follow line and switch to Pixy mode when needed
 void irsensor() {
   
   int frontleft = digitalRead(flsensor);
   int frontright = digitalRead(frsensor);
   int backleft = digitalRead(blsensor);
   int backright = digitalRead(brsensor);
-  //Serial.print(frontleft);
-  //Serial.println(frontright);
-  //Serial.print(backleft);
-  //Serial.println(backright);
   
-  if (frontleft == 1 && frontright == 1 && backleft == 1 && backright == 1) {
+  // Both front sensors detect the trigger condition
+  if (frontleft == 1 && frontright == 1) {
     stopMotors();
-    delay(2000);
     function = 2;
-    return;  // assignment, not comparison
+    return; 
   }
 
-  else if (frontright == 0 && frontleft == 1 || backleft == 1) {
-    if(backleft == 1){
-      turnLeft(175);
-    } else {
-      turnLeft(125);
-    }
+  // Adjust left
+  else if (frontright == 0 && frontleft == 1) {
+    turnLeft(100);
   }
 
-  else if (frontright == 1 && frontleft == 0 || backright == 1) {
-    if(backright == 1){
-      turnRight(175);
-    } else {
-      turnRight(150);
-    }
+  // Adjust right
+  else if (frontright == 1 && frontleft == 0) {
+    turnRight(100);
   }
 
-  //else if (frontright == 0 && frontleft == 0 && backright == 1 && backleft == 0) {
-    //hardRight(150);  // hard right
-  //}
+  // Hard right correction
+  else if (frontright == 0 && frontleft == 0 && backright == 1 && backleft == 0) {
+    turnRight(90);
+  }
 
-  //else if (frontright == 0 && frontleft == 0 && backright == 0 && backleft == 1) {
-    //hardLeft(150);  // hard left
-  //}
+  // Hard left correction
+  else if (frontright == 0 && frontleft == 0 && backright == 0 && backleft == 1) {
+    turnLeft(90);
+  }
 
+  // Default forward movement
   else {
-    forward(185);
+    forward(130);
   }
 }
 
-void setup() {
+// -------------------- Setup --------------------
 
-  Serial.begin(115200);
-  Serial.begin(9600);
-  
+void setup() {
   pixy.init();
 
   claw.attach(9);
   lift.attach(10);
+
+  // Set servos to starting positions
   claw.write(90);
   lift.write(45);
+
+  // Set sensor pin modes
   pinMode(flsensor, INPUT);
   pinMode(frsensor, INPUT);
   pinMode(blsensor, INPUT);
   pinMode(brsensor, INPUT_PULLUP);
 }
-void loop() {
-  if (function == 1){
-  irsensor();
-  }
-  else if (function ==2){
-  pixytrack();
-  }
-  else
-  grabObject();
 
- 
+// -------------------- Main Loop --------------------
+
+void loop() {
+  if (function == 1) {
+    irsensor();
+  }
+  else if (function == 2) {
+    pixytrack();
+  }
+  else {
+    grabObject();
+  }
 }
