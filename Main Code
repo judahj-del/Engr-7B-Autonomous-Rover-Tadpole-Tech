@@ -1,3 +1,35 @@
+
+/*
+------------------------------------------------------------
+Team: Tadpole Tech
+
+Team Members:
+Judah Johnson
+Charlize Pena
+Kaelyn Ruiz
+Josh Toman
+Conor Tam
+Calvin Hong
+Patrick Elyass
+
+Last Edited: March 10, 2026
+
+Program Summary:
+This program controls an autonomous rover that follows a line
+using IR sensors, detects and tracks objects using a Pixy2
+camera, and grabs the detected object using a claw and lift
+servo mechanism.
+
+The robot operates in three modes:
+1. Line Following – Uses front and rear IR sensors to follow
+   a line on the ground.
+2. Pixy Tracking – Uses proportional control with the Pixy2
+   camera to center on and approach an object.
+3. Object Grabbing – Activates the claw and lift servos to
+   grab the object once the robot is close enough.
+------------------------------------------------------------
+*/
+
 #include <CytronMotorDriver.h>
 #include <Pixy2.h>
 #include <Servo.h>
@@ -174,27 +206,27 @@ void irsensor() {
 
   // Adjust left
   else if (frontright == 0 && frontleft == 1) {
-    turnLeft(100);
+    turnLeft(118);
   }
 
   // Adjust right
   else if (frontright == 1 && frontleft == 0) {
-    turnRight(100);
+    turnRight(118);
   }
 
   // Hard right correction
   else if (frontright == 0 && frontleft == 0 && backright == 1 && backleft == 0) {
-    turnRight(90);
+    turnRight(152);
   }
 
   // Hard left correction
   else if (frontright == 0 && frontleft == 0 && backright == 0 && backleft == 1) {
-    turnLeft(90);
+    turnLeft(152);
   }
 
   // Default forward movement
   else {
-    forward(130);
+    forward(135);
   }
 }
 
